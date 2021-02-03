@@ -7,25 +7,10 @@ import Popper from "popper.js"; // skip this if you do not use bootstrap modals
 
 import "./styles.css";
 import inventory from "./inventory.ES6";
+import ComposeSalad from "./ComposeSalad";
 import ComposeSaladModal from "./ComposeSaladModal";
-import ViewOrder from "./ViewOrder";
-import Counter from "./Counter";
-
 
 class App extends Component {
-  constructor(props){
-    super(props);
-    this.state = {salads : []};
-    this.addToCart = this.addToCart.bind(this);
-    this.counter = new Counter();
-  }
-
-  addToCart(salad){
-    this.setState({
-      salads : this.state.salads.concat([salad])
-    });
-  }
-
   render() {
     return (
       <div>
@@ -37,12 +22,8 @@ class App extends Component {
           <hr className="my-4" />
           <p>This code is a good starting point for lab 2.</p>
         </div>
-        <div style={{margin: "25px"}}>
-          <ComposeSaladModal inventory={inventory} addToCart={this.addToCart} counter={this.counter}/>
-        </div>
-        <div style={{margin: "25px"}}>
-          <ViewOrder order={this.state.salads} />
-        </div>
+
+        <ComposeSaladModal inventory={inventory} />
       </div>
     );
   }
