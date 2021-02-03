@@ -1,5 +1,6 @@
 import React from "react";
 import Salad from "./Salad"
+import SaladCheckbox from "./SaladCheckbox"
 
 class ComposeSalad extends React.Component {
   constructor(props) {
@@ -34,14 +35,9 @@ class ComposeSalad extends React.Component {
   }
 
   ingredientCheckbox(ingredient){
-    const inventory = this.props.inventory;
+    const cost = this.props.inventory[ingredient].price;
     return(
-      <div className="form-check" key={`${ingredient}Div`}>
-        <input className="form-check-input" type="checkbox" value="" key={ingredient} onChange={this.toggleIngredient.bind(this,ingredient)}></input>
-        <label className="form-check-label" htmlFor="ingredientCheckbox">
-          {`${ingredient} (+${inventory[ingredient].price}kr)`/* Skriver ut namn och pris för en angiven ingrediens */}
-        </label>
-      </div>
+      <SaladCheckbox ingredient={ingredient} onChange={this.toggleIngredient} cost={cost}/>
     );
   }
 
