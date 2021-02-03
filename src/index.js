@@ -16,14 +16,13 @@ class App extends Component {
   constructor(props){
     super(props);
     this.state = {salads : []};
-    this.addToCart = this.addToCart.bind(this);
     this.counter = new Counter();
   }
 
   addToCart(salad){
-    this.setState({
-      salads : this.state.salads.concat([salad])
-    });
+    this.setState(prevState => ({
+      salads: [...prevState.salads, salad]
+    }))
   }
 
   render() {
@@ -38,7 +37,7 @@ class App extends Component {
           <p>This code is a good starting point for lab 2.</p>
         </div>
         <div style={{margin: "25px"}}>
-          <ComposeSaladModal inventory={inventory} addToCart={this.addToCart} counter={this.counter}/>
+          <ComposeSaladModal inventory={inventory} addToCart={this.addToCart.bind(this)} counter={this.counter}/>
         </div>
         <div style={{margin: "25px"}}>
           <ViewOrder order={this.state.salads} />

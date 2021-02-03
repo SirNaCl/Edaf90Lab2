@@ -7,13 +7,21 @@ class ViewOrder extends React.Component{
     }
 
     componentWillReceiveProps(nextProps) {
-        this.setState({ order: nextProps.order });  
+        this.setState({order: nextProps.order}); 
     }
 
     listIngredient(ingredient){
         return(
             <li key={ingredient}>{ingredient}</li>
         );
+    }
+
+    calcTotalPrice(){
+        const reducer = (accumulator, currentValue) => accumulator + currentValue;
+        let prices = [0];
+        console.log(this.state);
+        this.state.order.map(salad => prices.push(salad.price()));
+        return prices.reduce(reducer);
     }
 
     displaySalad(salad){
@@ -44,6 +52,9 @@ class ViewOrder extends React.Component{
                         {salad.saladDressings.map(ingredient=>this.listIngredient(ingredient))}
                     </ul>
                 </div>
+                <div>
+                    <h5>{`Pris: ${salad.price()}kr`}</h5>
+                </div>
             </div>
         );
     }
@@ -51,7 +62,7 @@ class ViewOrder extends React.Component{
     render(){
         return(
             <div>
-                <h2>Din kundvagn:</h2>
+                <h2>Din kundvagn:     ({this.calcTotalPrice()}kr)</h2>
                 {this.state.order.map(salad=>this.displaySalad(salad))}
             </div>
         );

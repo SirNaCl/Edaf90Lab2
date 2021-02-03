@@ -5,6 +5,7 @@ class Salad {
         this.proteins = items.filter(item => inventory[item].protein);
         this.extras = items.filter(item => inventory[item].extra);
         this.dressings = items.filter(item => inventory[item].dressing);
+        this.inventory = inventory;
 
         this.saladFoundation = undefined;
         this.saladProteins = [];
@@ -72,30 +73,6 @@ class Salad {
         console.log(`Proteins: ${this.saladProteins}`);
         console.log(`Extras: ${this.saladExtras}`);
         console.log(`Dressings: ${this.saladDressings}`);
-    }
-
-    toggleIngredient(ingredient) {
-        if (this.foundations.includes(ingredient)) {
-            this.changeFoundation(ingredient);
-        } else if (this.proteins.includes(ingredient)) {
-            if (this.saladProteins.includes(ingredient)) {
-                this.removeProtein(ingredient);
-            } else {
-                this.addProtein(ingredient);
-            }
-        } else if (this.extras.includes(ingredient)) {
-            if (this.saladExtras.includes(ingredient)) {
-                this.removeExtra(ingredient);
-            } else {
-                this.addExtra(ingredient);
-            }
-        } else {
-            if (this.saladDressings.includes(ingredient)) {
-                this.removeDressing(ingredient);
-            } else {
-                this.addDressing(ingredient);
-            }
-        }
     }
 
     clear() {
