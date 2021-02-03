@@ -1,51 +1,97 @@
 import React from "react";
 import Salad from "./Salad"
 import SaladCheckbox from "./SaladCheckbox"
+import SaladRadioList from "./SaladRadioList"
 
 class ComposeSalad extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {checkBoxes: [], radioList: undefined};
     this.counter = this.props.counter;
-    this.salad = new Salad(this.props.inventory, this.counter.count());
     this.handleSubmit = this.handleSubmit.bind(this);
-    this.toggleIngredient = this.toggleIngredient.bind(this);
+    this.createSalad = this.createSalad.bind(this);
+    this.setState = this.setState.bind(this);
   }
 
   handleSubmit(event){
     event.preventDefault();
-    this.props.addToCart(this.salad);
-    this.salad.toString();
+    
+    let salad = this.createSalad();
+    this.props.addToCart(salad);
     // Återställer salladsskaparen
     document.getElementById("saladForm").reset();
-    this.salad = new Salad(this.props.inventory, this.counter.count());
+    this.resetOptions();
   }
 
-  foundationRadio(foundation){
-    // Skapar radio-knappar för baser
-    const inventory = this.props.inventory;
-    return(
-      <div className="form-check" key={`${foundation}Div`}>
-          <input className="form-check-input" type="radio" name="foundationRadios"  onChange={this.toggleIngredient.bind(this, foundation)} required></input>
-          <label className="form-check-label" htmlFor="exampleRadios1">
-            {`${foundation} (+${inventory[foundation].price}kr)` /* Skriver ut namn och kostnad för en angiven bas*/} 
-          </label>
-      </div>
-    );
+  resetOptions(){
+    this.setState(prevState => ({
+      checkBoxes: prevState.checkBoxes.map(box=>box.reset()),
+      radioList: prevState.radioList.reset()
+    }))
   }
+
+
+
 
   ingredientCheckbox(ingredient){
     const cost = this.props.inventory[ingredient].price;
     return(
-      <SaladCheckbox ingredient={ingredient} onChange={this.toggleIngredient} cost={cost}/>
+      <SaladCheckbox ingredient={ingredient} cost={cost} addBox={this.addCheckbox.bind(this)}/>
     );
   }
 
-  toggleIngredient(ingredient){
-    // skicka in namnet på en ingredient och baserat på om den finns eller inte så ändras den i salladen
-    // denna anropas av onChange i checkboxarna osv.
-    this.salad.toggleIngredient(ingredient);
+  addCheckbox(box){
+    this.setState(prevState => ({
+      checkBoxes: [...prevState.checkBoxes, box]
+    }))
   }
+
+  addRadioList(rl){
+    this.setState({radioList: rl});
+  }
+
+
+  checkedBoxes(){
+    return this.state.checkBoxes.filter(box=>box.isChecked());
+  }
+
+  checkedRadio(){
+    return this.state.radioList.state.checked;
+  }
+
+  ingredientsFromBoxes(boxes){
+    let ingredients = [];
+    boxes.map(box=>ingredients.push(box.ingredient));
+    return ingredients;
+  }
+
+
+  createSalad(){
+    const inventory = this.props.inventory;
+    let proteins = Object.keys(inventory).filter(item => inventory[item].protein);
+    let extras = Object.keys(inventory).filter(item => inventory[item].extra);
+    let dressings = Object.keys(inventory).filter(item => inventory[item].dressing);  
+    let salad = new Salad(inventory, this.counter.count());
+    let checkedB = this.checkedBoxes();
+    let ingredients = this.ingredientsFromBoxes(checkedB);
+    let foundation= this.checkedRadio();
+
+    salad.changeFoundation(foundation);
+    ingredients.filter(ingredient=>proteins.includes(ingredient)).map(ingredient=>salad.addProtein(ingredient));
+    ingredients.filter(ingredient=>extras.includes(ingredient)).map(ingredient=>salad.addExtra(ingredient));
+    ingredients.filter(ingredient=>dressings.includes(ingredient)).map(ingredient=>salad.addDressing(ingredient));
+
+    salad.toString();
+    return salad;
+  }
+
+
+
+  // toggleIngredient(ingredient){
+  //   // skicka in namnet på en ingredient och baserat på om den finns eller inte så ändras den i salladen
+  //   // denna anropas av onChange i checkboxarna osv.
+  //   this.salad.toggleIngredient(ingredient);
+  // }
 
 
   render() {
@@ -64,7 +110,7 @@ class ComposeSalad extends React.Component {
       <form onSubmit={this.handleSubmit} id="saladForm">
         <h4>Välj bas</h4>
         <div className="form-check">
-        {foundations.map(found => this.foundationRadio(found))}
+          <SaladRadioList ingredients={foundations} inventory={this.props.inventory} addRadioList={this.addRadioList.bind(this)}/>
         <br></br>
         </div>
       
