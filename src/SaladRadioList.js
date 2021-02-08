@@ -23,6 +23,7 @@ class SaladRadioList extends React.Component{
 
     generateButton(ingredient){
         return (<SaladRadio 
+            key={ingredient}
             ingredient={ingredient} 
             cost={this.inventory[ingredient].price} 
             addRadio={this.addRadio.bind(this)} 

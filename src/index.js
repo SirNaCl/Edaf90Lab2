@@ -29,17 +29,19 @@ class App extends Component {
     return (
       <div>
         <div className="jumbotron text-center">
-          <h1 className="display-4">EDAF90 - Web Programming</h1>
+          <h1 className="display-4">Smarriga Salader</h1>
           <p className="lead">
-            This is a template project for react + router + bootstrap.
+            EDAF90 - Web Programming
           </p>
           <hr className="my-4" />
-          <p>This code is a good starting point for lab 2.</p>
+          <p>Emil Gedenryd & Teodor Ahlinder</p>
         </div>
         <div style={{margin: "25px"}}>
-          <ComposeSaladModal inventory={inventory} addToCart={this.addToCart.bind(this)} counter={this.counter}/>
+          {/*Skapar en modal där användaren kan sätta ihop en sallad*/}
+          <ComposeSaladModal inventory={inventory} addToCart={this.addToCart.bind(this)} counter={this.counter}/>{/**in i salad */}
         </div>
         <div style={{margin: "25px"}}>
+          {/*Listar ut alla sallader som finns i ordern*/}
           <ViewOrder order={this.state.salads} />
         </div>
       </div>

@@ -10,16 +10,15 @@ class ViewOrder extends React.Component{
         this.setState({order: nextProps.order}); 
     }
 
-    listIngredient(ingredient){
+    listIngredient(ingredient, salad){
         return(
-            <li key={ingredient}>{ingredient}</li>
+            <li key={ingredient}>{ingredient}  ({salad.inventory[ingredient].price}kr)</li>
         );
     }
 
     calcTotalPrice(){
         const reducer = (accumulator, currentValue) => accumulator + currentValue;
         let prices = [0];
-        console.log(this.state);
         this.state.order.map(salad => prices.push(salad.price()));
         return prices.reduce(reducer);
     }
@@ -31,25 +30,25 @@ class ViewOrder extends React.Component{
                  <div>
                     <h5>Bas:</h5>
                     <ul>
-                        <li>{salad.saladFoundation}</li>
+                        {this.listIngredient(salad.saladFoundation, salad)}
                     </ul>
                 </div>
                 <div>
                     <h5>Protein:</h5>
                     <ul>
-                        {salad.saladProteins.map(ingredient=>this.listIngredient(ingredient))}
+                        {salad.saladProteins.map(ingredient=>this.listIngredient(ingredient, salad))}
                     </ul>
                 </div>
                 <div>
                     <h5>Tillbehör:</h5>
                     <ul>
-                        {salad.saladExtras.map(ingredient=>this.listIngredient(ingredient))}
+                        {salad.saladExtras.map(ingredient=>this.listIngredient(ingredient, salad))}
                     </ul>
                 </div>
                 <div>
                     <h5>Dressing:</h5>
                     <ul>
-                        {salad.saladDressings.map(ingredient=>this.listIngredient(ingredient))}
+                        {salad.saladDressings.map(ingredient=>this.listIngredient(ingredient, salad))}
                     </ul>
                 </div>
                 <div>

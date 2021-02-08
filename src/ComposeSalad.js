@@ -9,38 +9,38 @@ class ComposeSalad extends React.Component {
     this.state = {checkBoxes: [], radioList: undefined};
     this.counter = this.props.counter;
     this.handleSubmit = this.handleSubmit.bind(this);
-    this.createSalad = this.createSalad.bind(this);
-    this.setState = this.setState.bind(this);
   }
 
   handleSubmit(event){
+    // Hindrar eventet att ladda om sidan vid submit
     event.preventDefault();
-    
+
+    //Skapar en sallad och skickar upp den i hierarkin så att den kan läggas in i ordern
     let salad = this.createSalad();
     this.props.addToCart(salad);
+    
     // Återställer salladsskaparen
     document.getElementById("saladForm").reset();
     this.resetOptions();
   }
 
   resetOptions(){
+    // Återställer alla objekt som befinner sig i staten
     this.setState(prevState => ({
       checkBoxes: prevState.checkBoxes.map(box=>box.reset()),
       radioList: prevState.radioList.reset()
     }))
   }
 
-
-
-
   ingredientCheckbox(ingredient){
     const cost = this.props.inventory[ingredient].price;
     return(
-      <SaladCheckbox ingredient={ingredient} cost={cost} addBox={this.addCheckbox.bind(this)}/>
+      <SaladCheckbox key={ingredient} ingredient={ingredient} cost={cost} addBox={this.addCheckbox.bind(this)}/>
     );
   }
 
   addCheckbox(box){
+    // Lägger in checkboxar i staten för att kunna se deras status
     this.setState(prevState => ({
       checkBoxes: [...prevState.checkBoxes, box]
     }))
@@ -49,7 +49,6 @@ class ComposeSalad extends React.Component {
   addRadioList(rl){
     this.setState({radioList: rl});
   }
-
 
   checkedBoxes(){
     return this.state.checkBoxes.filter(box=>box.isChecked());
@@ -65,8 +64,8 @@ class ComposeSalad extends React.Component {
     return ingredients;
   }
 
-
   createSalad(){
+    // returnerar en sallad baserat på komponenterna i staten till
     const inventory = this.props.inventory;
     let proteins = Object.keys(inventory).filter(item => inventory[item].protein);
     let extras = Object.keys(inventory).filter(item => inventory[item].extra);
@@ -84,15 +83,6 @@ class ComposeSalad extends React.Component {
     salad.toString();
     return salad;
   }
-
-
-
-  // toggleIngredient(ingredient){
-  //   // skicka in namnet på en ingredient och baserat på om den finns eller inte så ändras den i salladen
-  //   // denna anropas av onChange i checkboxarna osv.
-  //   this.salad.toggleIngredient(ingredient);
-  // }
-
 
   render() {
     const inventory = this.props.inventory;
