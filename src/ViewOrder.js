@@ -4,10 +4,11 @@ class ViewOrder extends React.Component{
     constructor(props){
         super(props);
         this.state = {order: []};
+        this.state.order = this.props.getSalads();
     }
 
     componentWillReceiveProps(nextProps) {
-        this.setState({order: nextProps.order}); 
+        this.setState({order: nextProps.getSalads()}); 
     }
 
     listIngredient(ingredient, salad){
@@ -60,7 +61,7 @@ class ViewOrder extends React.Component{
 
     render(){
         return(
-            <div>
+            <div style={{margin: "45px"}}>
                 <h2>Din kundvagn:     ({this.calcTotalPrice()}kr)</h2>
                 {this.state.order.map(salad=>this.displaySalad(salad))}
             </div>

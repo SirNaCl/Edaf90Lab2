@@ -4,7 +4,7 @@ import SaladRadio from "./SaladRadio";
 class SaladRadioList extends React.Component{
     constructor(props){
         super(props);
-        this.state = {checked: "Sallad", radios: []};
+        this.state = {checked: undefined, radios: [], clicked: false};
         this.ingredients = this.props.ingredients;
         this.inventory = this.props.inventory;
         this.props.addRadioList(this);
@@ -17,9 +17,11 @@ class SaladRadioList extends React.Component{
     }
 
     reset(){
-        this.setState({checked: "Sallad"});
+        this.setState({checked: undefined});
         return this; 
     }
+
+    //TODO: Försök göra så att jag inte är tvungen att skriva ut felmeddelandet under varje knapp!
 
     generateButton(ingredient){
         return (<SaladRadio 
@@ -28,18 +30,27 @@ class SaladRadioList extends React.Component{
             cost={this.inventory[ingredient].price} 
             addRadio={this.addRadio.bind(this)} 
             checkedRadio={this.state.checked} 
-            onCheck={this.onCheck.bind(this)}/>);
+            onCheck={this.onCheck.bind(this)}
+            />
+            );
     }
 
-    onCheck(ingredient){
-        this.setState({checked: ingredient});
+    onCheck(event){
+        this.setState({checked: event.target.value});   
+        if(this.state.clicked){
+            this.props.validate();
+        }else{
+            this.setState({clicked: true})
+        }
+       
     }
-
 
 
     render(){
         return(
-            this.ingredients.map(ingredient=>this.generateButton(ingredient))
+            <div className="form-group">
+                {this.ingredients.map(ingredient=>this.generateButton(ingredient))}
+            </div>
         );
     }
 }

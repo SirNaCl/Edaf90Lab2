@@ -12,7 +12,7 @@ class Salad {
         this.saladExtras = [];
         this.saladDressings = [];
 
-        this.id = id;
+        this.uid = id;
     }
 
     changeFoundation(foundation) {

@@ -1,4 +1,7 @@
 import React from "react";
+import "bootstrap/dist/css/bootstrap.css";
+import "bootstrap/dist/js/bootstrap.js";
+import "./styles.css";
 
 class SaladRadio extends React.Component{
     constructor(props){
@@ -15,8 +18,8 @@ class SaladRadio extends React.Component{
     }
 
 
-    toggle(){
-        this.onCheck(this.ingredient);
+    toggle(event){
+        this.onCheck(event);
     }
 
     isChecked(){
@@ -26,12 +29,21 @@ class SaladRadio extends React.Component{
 
     render(){
         return(
-            <div className="form-check" key={`${this.ingredient}Div`}>
-                <input className="form-check-input" type="radio" name="foundationRadio" value="" key={this.ingredient} checked={this.ingredient === this.checkedRadio} onChange={this.toggle.bind(this)}></input>
-                <label className="form-check-label" htmlFor="ingredientRadio">
-                {`${this.ingredient} (+${this.cost}kr)`/* Skriver ut namn och pris för en angiven ingrediens */}
+            <div className="form-check">
+                <input required 
+                className="form-check-input" 
+                type="radio" 
+                name="foundationRadio" 
+                value={this.ingredient} 
+                key={this.ingredient} 
+                checked={this.ingredient === this.checkedRadio} 
+                onChange={this.toggle.bind(this)}>         
+                </input>
+                <label className="form-check-label" htmlFor="foundationRadio">
+                    {`${this.ingredient} (+${this.cost}kr)`}
                 </label>
             </div>
+           
         );
     }
 }
