@@ -28,7 +28,7 @@ class ComposeSalad extends React.Component {
     event.preventDefault();
     
     // Kontrollerar om formen är valid. Om inte så stoppar den submit och visar felmeddelanden
-    if(this.validateForm()){
+    if(this.isFormValid()){
       let salad = this.createSalad();
       this.props.addToCart(salad);
       
@@ -39,16 +39,21 @@ class ComposeSalad extends React.Component {
       this.props.history.push("/viewOrder");
 
     }else{
-      //event.target.classList.add("was-validated");
+      /*  
+      TODO: Ger validated till elementen i formen. 
+      Tas dock bort från checkboxar med speciella krav eftersom de inte kan använda required.
+      Deras färg hanteras av valideringsfunktionerna
+      */
       $('#saladForm').children().addClass("was-validated");
       $('#saladForm .requiredCheckboxes').removeClass("was-validated");
     }
   }
 
-  validateForm(){
+  //TODO: Hjälpmetod för att garantera att alla valideringsfunktioner körs
+  isFormValid(){
     let bool1 = this.validateDressings();
     let bool2 = this.validateFoundation();
-    return !bool1 && !bool2
+    return bool1 && bool2
   }
 
   resetOptions(){
@@ -111,6 +116,7 @@ class ComposeSalad extends React.Component {
     return salad;
   }
 
+  //TODO: Returnerar ett JSX element om det ska skrivas ut ett felmeddelande om baser
   foundationWarning(){
     if(this.state.formErrors.foundations){
       return (
@@ -120,6 +126,7 @@ class ComposeSalad extends React.Component {
     }
   }
 
+  //TODO: Om det är ett fel i dressingen så ändras färg på texten och en alert skrivs ut
   dressingWarning(){
     if(this.state.formErrors.dressings){
       $('div.requiredCheckboxes .form-check').addClass("invalidFeedbackCustom");
@@ -134,55 +141,58 @@ class ComposeSalad extends React.Component {
   }
 
   /*
-    Anropas av radioList när det blir klickad för att bekräfta att den är validerad.
+    TODO: Anropas av radioList när det blir klickad för att bekräfta att den är validerad.
     om det inte har skett någon förändring så görs inget. 
-    returns true om den är giltig
+    returns true om det finns något fel
     */
   validateFoundation(){
     if(this.state.radioList.state.checked === undefined){
       this.setState(prevState => ({
         formErrors: {dressings: prevState.formErrors.dressings, foundations: true}
       }));
-      return true;
+      return false;
 
     }else if(this.state.radioList.state.checked !== undefined){
       this.setState(prevState => ({
         formErrors: {dressings: prevState.formErrors.dressings, foundations: false}
       }));
-      return false;
+      return true;
     }
   }
 
-  returnChangedObject(object, key, value){
-    object[key] = value;
-    return object;
-  }
-
+  /* 
+  TODO: gör så att fälten blir valid/invalid beroende på resultat. 
+        Kontrollerar längden på den array som skapas då alla "icheckade" rutor väljs
+  */
   validateDressings(){
-    //TODO: gör så att fälten blir valid/invalid beroende på resultat.
+    // Om det finns icheckade rutor
     if($('div.requiredCheckboxes .form-check :checkbox:checked').length > 0 && this.state.formErrors.dressings){
+      // Gör så att det inte är ett formError för dressing
       this.setState(prevState => ({
         formErrors: {dressings: false, foundations: prevState.formErrors.foundations}
       }));
-      console.log("Length > 0")
+      
+      // Ändrar färg på texten så att användaren ser att det är korrekt inmatning
       $('div.requiredCheckboxes .form-check').addClass("validFeedbackCustom");
       if($('div.requiredCheckboxes .form-check').hasClass("invalidFeedbackCustom")){
         $('div.requiredCheckboxes .form-check').removeClass("invalidFeedbackCustom");
       }
-      return false;
+      return true;
 
+      // Om det inte finns icheckade rutor
     }else if ($('div.requiredCheckboxes .form-check :checkbox:checked').length === 0){
-      console.log("Length === 0")
+      // Sparar i state att dressings inte är korrekt inmatat
       this.setState(prevState => ({
         formErrors: {dressings: true, foundations: prevState.formErrors.foundations}  
       }));
       
+      // Stylar om texten så att användaren ser att det är felaktigt inmatat
       $('div.requiredCheckboxes .form-check').addClass("invalidFeedbackCustom");
       if($('div.requiredCheckboxes .form-check').hasClass("validFeedbackCustom")){
         $('div.requiredCheckboxes .form-check').removeClass("validFeedbackCustom");
         $('#saladForm .requiredCheckboxes').removeClass("was-validated")
       }
-      return true;
+      return false;
     }
   }
 
