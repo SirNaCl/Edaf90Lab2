@@ -8,6 +8,7 @@ class SaladRadioList extends React.Component{
         this.ingredients = this.props.ingredients;
         this.inventory = this.props.inventory;
         this.props.addRadioList(this);
+
     }
 
     addRadio(radio){
@@ -20,8 +21,6 @@ class SaladRadioList extends React.Component{
         this.setState({checked: undefined});
         return this; 
     }
-
-    //TODO: Försök göra så att jag inte är tvungen att skriva ut felmeddelandet under varje knapp!
 
     generateButton(ingredient){
         return (<SaladRadio 
@@ -44,7 +43,6 @@ class SaladRadioList extends React.Component{
         }
        
     }
-
 
     render(){
         return(
