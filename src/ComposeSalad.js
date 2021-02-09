@@ -26,16 +26,9 @@ class ComposeSalad extends React.Component {
   handleSubmit(event){
     // Hindrar eventet att ladda om sidan vid submit
     event.preventDefault();
-    this.validateFoundation();
-    this.validateDressings();
-
+    
     // Kontrollerar om formen är valid. Om inte så stoppar den submit och visar felmeddelanden
-    if(this.state.formErrors.dressings || this.state.formErrors.foundations){
-      //event.target.classList.add("was-validated");
-      $('#saladForm').children().addClass("was-validated");
-      $('#saladForm .requiredCheckboxes').removeClass("was-validated")
-
-    }else{
+    if(this.validateForm()){
       let salad = this.createSalad();
       this.props.addToCart(salad);
       
@@ -44,7 +37,18 @@ class ComposeSalad extends React.Component {
       this.resetOptions();
 
       this.props.history.push("/viewOrder");
+
+    }else{
+      //event.target.classList.add("was-validated");
+      $('#saladForm').children().addClass("was-validated");
+      $('#saladForm .requiredCheckboxes').removeClass("was-validated");
     }
+  }
+
+  validateForm(){
+    let bool1 = this.validateDressings();
+    let bool2 = this.validateFoundation();
+    return !bool1 && !bool2
   }
 
   resetOptions(){
@@ -135,19 +139,17 @@ class ComposeSalad extends React.Component {
     returns true om den är giltig
     */
   validateFoundation(){
-    let newState = this.state.formErrors;
-
-    if(this.state.radioList.state.checked === undefined && !this.state.formErrors.foundations){
-      newState.foundations = true;
+    if(this.state.radioList.state.checked === undefined){
       this.setState(prevState => ({
-        formErrors: newState
+        formErrors: {dressings: prevState.formErrors.dressings, foundations: true}
       }));
+      return true;
 
-    }else if(this.state.radioList.state.checked !== undefined && this.state.formErrors.foundations){
-      newState.foundations = false;
+    }else if(this.state.radioList.state.checked !== undefined){
       this.setState(prevState => ({
-        formErrors: newState
+        formErrors: {dressings: prevState.formErrors.dressings, foundations: false}
       }));
+      return false;
     }
   }
 
@@ -160,28 +162,28 @@ class ComposeSalad extends React.Component {
     //TODO: gör så att fälten blir valid/invalid beroende på resultat.
     if($('div.requiredCheckboxes .form-check :checkbox:checked').length > 0 && this.state.formErrors.dressings){
       this.setState(prevState => ({
-        formErrors: this.returnChangedObject(prevState, "dressings", false)
+        formErrors: {dressings: false, foundations: prevState.formErrors.foundations}
       }));
-
+      console.log("Length > 0")
       $('div.requiredCheckboxes .form-check').addClass("validFeedbackCustom");
       if($('div.requiredCheckboxes .form-check').hasClass("invalidFeedbackCustom")){
         $('div.requiredCheckboxes .form-check').removeClass("invalidFeedbackCustom");
       }
+      return false;
 
-      return true;
     }else if ($('div.requiredCheckboxes .form-check :checkbox:checked').length === 0){
+      console.log("Length === 0")
       this.setState(prevState => ({
-        formErrors: this.returnChangedObject(prevState, "dressings", true)
+        formErrors: {dressings: true, foundations: prevState.formErrors.foundations}  
       }));
       
       $('div.requiredCheckboxes .form-check').addClass("invalidFeedbackCustom");
       if($('div.requiredCheckboxes .form-check').hasClass("validFeedbackCustom")){
         $('div.requiredCheckboxes .form-check').removeClass("validFeedbackCustom");
+        $('#saladForm .requiredCheckboxes').removeClass("was-validated")
       }
-
-      return false;
+      return true;
     }
-
   }
 
   render() {
@@ -226,6 +228,7 @@ class ComposeSalad extends React.Component {
           </div>
           <input type="submit" className="btn btn-primary" value="Lägg till i kundvagn"/>
         </form>
+        {console.log(this.state)}
       </div>
     );
   }

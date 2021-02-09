@@ -2,6 +2,7 @@ import React from "react";
 import SaladRadio from "./SaladRadio";
 
 class SaladRadioList extends React.Component{
+
     constructor(props){
         super(props);
         this.state = {checked: undefined, radios: [], clicked: false};
@@ -34,14 +35,9 @@ class SaladRadioList extends React.Component{
             );
     }
 
+    //TODO: Ny validering. Anropas när en radio blir vald. Anropar ComposeSalad.validateFoundation()
     onCheck(event){
-        this.setState({checked: event.target.value});   
-        if(this.state.clicked){
-            this.props.validate();
-        }else{
-            this.setState({clicked: true})
-        }
-       
+        this.setState({checked: event.target.value}, () => this.props.validate()); 
     }
 
     render(){
