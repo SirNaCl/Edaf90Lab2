@@ -21,6 +21,19 @@ class ComposeSalad extends React.Component {
     this.handleSubmit = this.handleSubmit.bind(this);
     this.validateFoundation = this.validateFoundation.bind(this);
     this.validateDressings = this.validateDressings.bind(this);
+    this.inventory = this.props.inventory;
+    this.dressingError = this.dressingError.bind(this);
+    
+    // test for correct ussage, the parent must send this datastructure
+    if (!this.inventory) {
+      alert("inventory is undefined in ComposeSalad");
+    }
+    this.foundations = Object.keys(this.inventory).filter(
+      name => this.inventory[name].foundation
+    );
+    this.proteins = Object.keys(this.inventory).filter(item => this.inventory[item].protein);
+    this.extras = Object.keys(this.inventory).filter(item => this.inventory[item].extra);
+    this.dressings = Object.keys(this.inventory).filter(item => this.inventory[item].dressing);  
   }
 
   handleSubmit(event){
@@ -44,8 +57,11 @@ class ComposeSalad extends React.Component {
       Tas dock bort från checkboxar med speciella krav eftersom de inte kan använda required.
       Deras färg hanteras av valideringsfunktionerna
       */
+     console.log("fastnar ej i 43")
       $('#saladForm').children().addClass("was-validated");
+      console.log(this.state)
       $('#saladForm .requiredCheckboxes').removeClass("was-validated");
+      this.setDressingColor();
     }
   }
 
@@ -53,7 +69,8 @@ class ComposeSalad extends React.Component {
   isFormValid(){
     let bool1 = this.validateDressings();
     let bool2 = this.validateFoundation();
-    return bool1 && bool2
+    console.log(`VD: ${bool1} Vf: ${bool2}`)
+    return !bool1 && !bool2
   }
 
   resetOptions(){
@@ -150,14 +167,36 @@ class ComposeSalad extends React.Component {
       this.setState(prevState => ({
         formErrors: {dressings: prevState.formErrors.dressings, foundations: true}
       }));
-      return false;
+      return true;
 
     }else if(this.state.radioList.state.checked !== undefined){
       this.setState(prevState => ({
         formErrors: {dressings: prevState.formErrors.dressings, foundations: false}
       }));
-      return true;
+      return false;
     }
+  }
+
+  dressingError(bool){
+    this.setState(prevState => ({
+        formErrors: {dressings: bool, foundations: prevState.formErrors.foundations}
+      }));
+  }
+
+  setDressingColor(){
+    if(this.state.formErrors.dressings){
+       $('div.requiredCheckboxes .form-check').addClass("invalidFeedbackCustom");
+      if($('div.requiredCheckboxes .form-check').hasClass("validFeedbackCustom")){
+        $('div.requiredCheckboxes .form-check').removeClass("validFeedbackCustom");
+        //$('#saladForm .requiredCheckboxes').removeClass("was-validated")
+      }
+    }else{
+      $('div.requiredCheckboxes .form-check').addClass("validFeedbackCustom");
+      if($('div.requiredCheckboxes .form-check').hasClass("invalidFeedbackCustom")){
+        $('div.requiredCheckboxes .form-check').removeClass("invalidFeedbackCustom");
+      }
+    }
+     
   }
 
   /* 
@@ -168,23 +207,25 @@ class ComposeSalad extends React.Component {
     // Om det finns icheckade rutor
     if($('div.requiredCheckboxes .form-check :checkbox:checked').length > 0 && this.state.formErrors.dressings){
       // Gör så att det inte är ett formError för dressing
-      this.setState(prevState => ({
+      /* this.setState(prevState => ({
         formErrors: {dressings: false, foundations: prevState.formErrors.foundations}
-      }));
+      })); */
+      this.dressingError(false);
       
       // Ändrar färg på texten så att användaren ser att det är korrekt inmatning
       $('div.requiredCheckboxes .form-check').addClass("validFeedbackCustom");
       if($('div.requiredCheckboxes .form-check').hasClass("invalidFeedbackCustom")){
         $('div.requiredCheckboxes .form-check').removeClass("invalidFeedbackCustom");
       }
-      return true;
+      return false;
 
       // Om det inte finns icheckade rutor
     }else if ($('div.requiredCheckboxes .form-check :checkbox:checked').length === 0){
       // Sparar i state att dressings inte är korrekt inmatat
-      this.setState(prevState => ({
+      /* this.setState(prevState => ({
         formErrors: {dressings: true, foundations: prevState.formErrors.foundations}  
-      }));
+      })); */
+      this.dressingError(true);
       
       // Stylar om texten så att användaren ser att det är felaktigt inmatat
       $('div.requiredCheckboxes .form-check').addClass("invalidFeedbackCustom");
@@ -192,48 +233,38 @@ class ComposeSalad extends React.Component {
         $('div.requiredCheckboxes .form-check').removeClass("validFeedbackCustom");
         $('#saladForm .requiredCheckboxes').removeClass("was-validated")
       }
-      return false;
+      return true;
     }
   }
 
   render() {
-    const inventory = this.props.inventory;
-    // test for correct ussage, the parent must send this datastructure
-    if (!inventory) {
-      alert("inventory is undefined in ComposeSalad");
-    }
-    let foundations = Object.keys(inventory).filter(
-      name => inventory[name].foundation
-    );
-    let proteins = Object.keys(inventory).filter(item => inventory[item].protein);
-    let extras = Object.keys(inventory).filter(item => inventory[item].extra);
-    let dressings = Object.keys(inventory).filter(item => inventory[item].dressing);  
+    
     return (
       <div style={{margin: "45px"}}>
         <form onSubmit={this.handleSubmit} id="saladForm" noValidate>
           <h4>Välj bas</h4>
           {this.foundationWarning()/* Triggers if no radio has been chosen */}
           <div className="form-group">
-            <SaladRadioList ingredients={foundations} inventory={this.props.inventory} addRadioList={this.addRadioList.bind(this)} validate={this.validateFoundation}/>
+            <SaladRadioList ingredients={this.foundations} inventory={this.props.inventory} addRadioList={this.addRadioList.bind(this)} validate={this.validateFoundation}/>
           <br></br>
           </div>
         
           <h4>Välj protein</h4>
           <div className="form-group">
-          {proteins.map(ingr => this.ingredientCheckbox(ingr, "proteins"))}
+          {this.proteins.map(ingr => this.ingredientCheckbox(ingr, "proteins"))}
           <br></br>
           </div>
 
           <h4>Välj tillbehör</h4>
           <div className="form-group">
-          {extras.map(ingr => this.ingredientCheckbox(ingr, "extras"))}
+          {this.extras.map(ingr => this.ingredientCheckbox(ingr, "extras"))}
           <br></br>
           </div>
           
           <h4>Välj dressing</h4>
           {this.dressingWarning()}
           <div className="form-group requiredCheckboxes" id="dressingCheckboxes">
-          {dressings.map(ingr => this.ingredientCheckbox(ingr, "dressings", {validate: this.validateDressings}))}
+          {this.dressings.map(ingr => this.ingredientCheckbox(ingr, "dressings", {validate: this.validateDressings}))}
           <br></br>
           </div>
           <input type="submit" className="btn btn-primary" value="Lägg till i kundvagn"/>
