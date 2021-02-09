@@ -14,7 +14,8 @@ class ComposeSalad extends React.Component {
       checkBoxes: [], 
       radioList: undefined, 
       formErrors: {foundations: false,
-                   dressings: false}
+                   dressings: false},
+      noDressingError: true
       };
                    
     this.counter = this.props.counter;
@@ -23,6 +24,7 @@ class ComposeSalad extends React.Component {
     this.validateDressings = this.validateDressings.bind(this);
     this.inventory = this.props.inventory;
     this.dressingError = this.dressingError.bind(this);
+    this.setDressingColor = this.setDressingColor.bind(this);
     
     // test for correct ussage, the parent must send this datastructure
     if (!this.inventory) {
@@ -146,10 +148,7 @@ class ComposeSalad extends React.Component {
   //TODO: Om det är ett fel i dressingen så ändras färg på texten och en alert skrivs ut
   dressingWarning(){
     if(this.state.formErrors.dressings){
-      $('div.requiredCheckboxes .form-check').addClass("invalidFeedbackCustom");
-      if($('div.requiredCheckboxes .form-check').hasClass("validFeedbackCustom")){
-        $('div.requiredCheckboxes .form-check').removeClass("validFeedbackCustom");
-      }
+      this.setDressingColor();
       return (
       <div className="alert alert-danger" role="alert">
           Du måste välja minst en dressing!
@@ -177,62 +176,47 @@ class ComposeSalad extends React.Component {
     }
   }
 
-  dressingError(bool){
-    this.setState(prevState => ({
-        formErrors: {dressings: bool, foundations: prevState.formErrors.foundations}
-      }));
-  }
-
+  //TODO: Ändrar färg på dressing div baserat på formError i state
   setDressingColor(){
-    if(this.state.formErrors.dressings){
-       $('div.requiredCheckboxes .form-check').addClass("invalidFeedbackCustom");
+    if(this.state.formErrors.dressings === true){
+      $('div.requiredCheckboxes .form-check').addClass("invalidFeedbackCustom");
       if($('div.requiredCheckboxes .form-check').hasClass("validFeedbackCustom")){
         $('div.requiredCheckboxes .form-check').removeClass("validFeedbackCustom");
-        //$('#saladForm .requiredCheckboxes').removeClass("was-validated")
       }
-    }else{
+    }else if(!this.state.noDressingError){ // Detta kriteriet hindrar text från att bli grön första knapptrycket
       $('div.requiredCheckboxes .form-check').addClass("validFeedbackCustom");
       if($('div.requiredCheckboxes .form-check').hasClass("invalidFeedbackCustom")){
         $('div.requiredCheckboxes .form-check').removeClass("invalidFeedbackCustom");
       }
     }
-     
+    
   }
 
+
+  dressingError(bool){
+      this.setState({formErrors: {dressings: bool, foundations: this.state.formErrors.foundations}}, () => this.setDressingColor())
+  }
+  
   /* 
   TODO: gör så att fälten blir valid/invalid beroende på resultat. 
         Kontrollerar längden på den array som skapas då alla "icheckade" rutor väljs
+        returnerar värdet på dressingError
   */
   validateDressings(){
     // Om det finns icheckade rutor
-    if($('div.requiredCheckboxes .form-check :checkbox:checked').length > 0 && this.state.formErrors.dressings){
+    if($('div.requiredCheckboxes .form-check :checkbox:checked').length > 0){
       // Gör så att det inte är ett formError för dressing
-      /* this.setState(prevState => ({
-        formErrors: {dressings: false, foundations: prevState.formErrors.foundations}
-      })); */
-      this.dressingError(false);
+      this.dressingError(false) ;
       
       // Ändrar färg på texten så att användaren ser att det är korrekt inmatning
-      $('div.requiredCheckboxes .form-check').addClass("validFeedbackCustom");
-      if($('div.requiredCheckboxes .form-check').hasClass("invalidFeedbackCustom")){
-        $('div.requiredCheckboxes .form-check').removeClass("invalidFeedbackCustom");
-      }
       return false;
 
       // Om det inte finns icheckade rutor
     }else if ($('div.requiredCheckboxes .form-check :checkbox:checked').length === 0){
       // Sparar i state att dressings inte är korrekt inmatat
-      /* this.setState(prevState => ({
-        formErrors: {dressings: true, foundations: prevState.formErrors.foundations}  
-      })); */
       this.dressingError(true);
-      
+      this.setState({noDressingError: false});
       // Stylar om texten så att användaren ser att det är felaktigt inmatat
-      $('div.requiredCheckboxes .form-check').addClass("invalidFeedbackCustom");
-      if($('div.requiredCheckboxes .form-check').hasClass("validFeedbackCustom")){
-        $('div.requiredCheckboxes .form-check').removeClass("validFeedbackCustom");
-        $('#saladForm .requiredCheckboxes').removeClass("was-validated")
-      }
       return true;
     }
   }
